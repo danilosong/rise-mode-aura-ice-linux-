@@ -1,0 +1,2 @@
+# Allow the logged-in user (member of plugdev) to write only to the detected controller.
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="aa88", ATTRS{idProduct}=="8666", GROUP="plugdev", MODE="0660", TAG+="uaccess"

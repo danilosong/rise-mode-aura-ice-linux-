@@ -1,0 +1,14 @@
+[Unit]
+Description=Rise Mode water cooler temperature display
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 @PROJECT_DIR@/app.py --no-web
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target
