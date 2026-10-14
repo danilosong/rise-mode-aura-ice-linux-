@@ -316,6 +316,7 @@ class Monitor:
         self.nvidia_checked_at = 0.0
         self.nvidia_cached_value: float | None = None
         self.nvidia_cached_error: str | None = None
+        self.last_cpu_spike_log = 0.0
         self.thread = threading.Thread(target=self.run, name="sensor-monitor", daemon=True)
 
     def read_nvidia_temperature(self, now: float) -> tuple[float | None, str | None]:
@@ -336,8 +337,23 @@ class Monitor:
             if gpu_raw is not None:
                 gpu_source = "nvidia-smi"
         board_raw = choose_temperature(temperatures, "board")
+        cpu_stable_before = self.temperature_filters["cpu"].stable
+        cpu_filtered = self.temperature_filters["cpu"].update(cpu_raw, now)
+        if (
+            cpu_raw is not None
+            and cpu_stable_before is not None
+            and abs(cpu_raw - cpu_stable_before) >= self.temperature_filters["cpu"].jump_threshold
+            and now - self.last_cpu_spike_log >= 10
+        ):
+            sent_value = int(cpu_filtered) if cpu_filtered is not None else None
+            print(
+                f"[{time.strftime('%H:%M:%S')}] CPU: leitura bruta {cpu_raw:.1f} °C; "
+                f"estável {cpu_stable_before:.1f} °C; valor enviado ao HID {sent_value}",
+                flush=True,
+            )
+            self.last_cpu_spike_log = now
         state = {
-            "cpu_temp": self.temperature_filters["cpu"].update(cpu_raw, now),
+            "cpu_temp": cpu_filtered,
             "gpu_temp": self.temperature_filters["gpu"].update(gpu_raw, now),
             "board_temp": self.temperature_filters["board"].update(board_raw, now),
             "gpu_temp_source": gpu_source,
@@ -388,7 +404,7 @@ class Monitor:
                 print(f"[{time.strftime('%H:%M:%S')}] Erro ao ler sensores/HID: {exc}", flush=True)
                 with self.lock:
                     self.state = {"updated_at": time.strftime("%H:%M:%S"), "error": str(exc)}
-            self.stop.wait(1.0)
+            self.stop.wait(0.25)
 
     def start(self) -> None:
         self.thread.start()
