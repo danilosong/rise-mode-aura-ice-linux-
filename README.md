@@ -18,6 +18,25 @@ Esse projeto substitui a interface Windows por um painel web local e troca a lei
 - Acesso de leitura aos sensores do kernel em `/sys/class/hwmon`.
 - Regra udev para o serviço de usuário acessar o dispositivo USB sem root.
 
+## Instalação pelo pacote Ubuntu
+
+Baixe o arquivo `.deb` na seção **Releases** do GitHub e instale-o:
+
+```bash
+sudo apt install ./rise-mode-aura-ice-linux_1.0.0_all.deb
+rise-mode-temp-setup
+```
+
+O pacote instala a regra udev e recarrega as regras do sistema. `rise-mode-temp-setup` deve ser executado sem `sudo`, na sessão do usuário que usará o visor. Se o dispositivo não for reconhecido imediatamente, desconecte e reconecte o USB.
+
+Para desativar o serviço automático desse usuário, execute `rise-mode-temp-remove`. Para abrir o painel local, rode `rise-mode-temp` e acesse <http://127.0.0.1:8765>.
+
+O pacote pode ser reconstruído a partir do código-fonte com:
+
+```bash
+./build-deb.sh 1.0.0
+```
+
 O painel usa apenas a biblioteca padrão do Python. Primeiro instale a regra de acesso ao dispositivo HID; o Ubuntu pedirá sua senha administrativa:
 
 ```bash
