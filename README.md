@@ -20,7 +20,7 @@ Esse projeto substitui a interface Windows por um painel web local e troca a lei
 
 ## Instalação pelo pacote Ubuntu
 
-Baixe o arquivo `.deb` na seção **Releases** do GitHub e instale-o:
+Baixe o arquivo `.deb` na pasta `dist/` deste repositório e instale-o:
 
 ```bash
 sudo apt install ./rise-mode-aura-ice-linux_1.0.0_all.deb
